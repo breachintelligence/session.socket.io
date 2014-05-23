@@ -18,17 +18,18 @@ module.exports = function(io, sessionStore, cookieParser, key) {
   // fikse denne
   this.getSession = function(socket, callback) {
     cookieParser(socket.handshake, {}, function (parseErr){
-      sessionStore.get(findCookie(socket.handshake), function (storeErr, session) {
+      var sid = findCookie(socket.handshake);
+      sessionStore.get(sid, function (storeErr, session) {
         var err = resolve(parseErr, storeErr, session);
-        callback(err, session);
+        callback(err, session, sid);
       });
     });
   };
 
   function bind(event, callback, namespace) {
     namespace.on(event, function (socket) {
-      this.getSession(socket, function (err, session) {
-        callback(err, socket, session);
+      this.getSession(socket, function (err, session, sid) {
+        callback(err, socket, session, sid);
       });
     }.bind(this));
   }
